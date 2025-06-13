@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
       - name: Sync fork with upstream
         uses: garmr-ulfr/fork-sync@request-pr-reviewers
         with:
