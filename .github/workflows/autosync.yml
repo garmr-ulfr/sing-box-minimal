@@ -9,10 +9,9 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-
+    name: Sync fork with upstream
     steps:
-      - name: Sync fork with upstream
-        uses: garmr-ulfr/fork-sync@request-pr-reviewers
+      - uses: garmr-ulfr/fork-sync@f8cdee689ecaaa06ac10b9706f89105c456f651c
         with:
           # The owner of your forked repository
           owner: garmr-ulfr
