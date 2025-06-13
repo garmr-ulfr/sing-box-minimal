@@ -26,5 +26,4 @@ jobs:
           auto_merge: false
           pr_title: 'Automated Fork Sync from Upstream'
           pr_message: 'test pr with reviewers'
-          pr_reviewers:
-            - garmr-ulfr
+          pr_reviewers: 'garmr-ulfr'
