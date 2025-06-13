@@ -15,13 +15,13 @@ jobs:
         uses: tgymnich/fork-sync@v2.0.10
         with:
           # The owner of your forked repository
-          owner: getlantern
+          owner: garmr-ulfr
           # The name of your forked repository
           repo: sing-box-minimal
           # The name of the branch where your changes are implemented.
           head: main
           # The name of the branch you want the changes pulled into.
-          base: lantern-main
+          base: autosync
           merge_method: merge
           auto_merge: false
           pr_title: 'Automated Fork Sync from Upstream'
