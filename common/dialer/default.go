@@ -100,10 +100,6 @@ func NewDefault(ctx context.Context, options option.DialerOptions) (*DefaultDial
 			} else if networkManager.AutoDetectInterface() {
 				if platformInterface != nil {
 					networkStrategy = (*C.NetworkStrategy)(options.NetworkStrategy)
-					if networkStrategy == nil {
-						networkStrategy = common.Ptr(C.NetworkStrategyDefault)
-						defaultNetworkStrategy = true
-					}
 					networkType = common.Map(options.NetworkType, option.InterfaceType.Build)
 					fallbackNetworkType = common.Map(options.FallbackNetworkType, option.InterfaceType.Build)
 					if networkStrategy == nil && len(networkType) == 0 && len(fallbackNetworkType) == 0 {
@@ -114,6 +110,10 @@ func NewDefault(ctx context.Context, options option.DialerOptions) (*DefaultDial
 					networkFallbackDelay = time.Duration(options.FallbackDelay)
 					if networkFallbackDelay == 0 && defaultOptions.FallbackDelay != 0 {
 						networkFallbackDelay = defaultOptions.FallbackDelay
+					}
+					if networkStrategy == nil {
+						networkStrategy = common.Ptr(C.NetworkStrategyDefault)
+						defaultNetworkStrategy = true
 					}
 					bindFunc := networkManager.ProtectFunc()
 					dialer.Control = control.Append(dialer.Control, bindFunc)
@@ -333,7 +333,17 @@ func (d *DefaultDialer) ListenSerialInterfacePacket(ctx context.Context, destina
 }
 
 func (d *DefaultDialer) ListenPacketCompat(network, address string) (net.PacketConn, error) {
-	return d.udpListener.ListenPacket(context.Background(), network, address)
+	udpListener := d.udpListener
+	udpListener.Control = control.Append(udpListener.Control, func(network, address string, conn syscall.RawConn) error {
+		for _, wgControlFn := range WgControlFns {
+			err := wgControlFn(network, address, conn)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return udpListener.ListenPacket(context.Background(), network, address)
 }
 
 func trackConn(conn net.Conn, err error) (net.Conn, error) {
